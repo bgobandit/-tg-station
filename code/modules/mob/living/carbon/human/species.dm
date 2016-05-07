@@ -74,6 +74,7 @@
 	var/safe_toxins_max = 0.05
 	var/SA_para_min = 1 //Sleeping agent
 	var/SA_sleep_min = 5 //Sleeping agent
+	var/BZ_trip_balls_min = 1 //BZ gas.
 
 	//Breath damage
 	var/oxy_breath_dam_min = 1
@@ -1221,6 +1222,7 @@
 
 	if(breath && !(NOBREATH in specflags))	// If there's some other shit in the air lets deal with it here.
 		var/SA_pp = breath.get_breath_partial_pressure(breath_gases["n2o"][MOLES])
+		
 		if(SA_pp > SA_para_min) // Enough to make us paralysed for a bit
 			H.Paralyse(3) // 3 gives them one second to wake up and run away a bit!
 			if(SA_pp > SA_sleep_min) // Enough to make us sleep as well
@@ -1228,8 +1230,16 @@
 		else if(SA_pp > 0.01)	// There is sleeping gas in their lungs, but only a little, so give them a bit of a warning
 			if(prob(20))
 				H.emote(pick("giggle", "laugh"))
+	
+		var/bz_pp = breath.get_breath_partial_pressure(breath_gases["bz"][MOLES])
+		if(bz_pp > BZ_trip_balls_min)
+			hallucination += 20
+		else if(bz_pp > 0.01)
+	 		hallucination += 5//Removed at 2 per tick so this will slowly build up
+	
 		handle_breath_temperature(breath, H)
 		breath.garbage_collect()
+		
 
 	return 1
 
